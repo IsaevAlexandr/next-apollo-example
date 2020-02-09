@@ -1,0 +1,61 @@
+.root {
+    max-width: 810px;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchInput {
+    margin-bottom: 30px;
+}
+.status {
+    height: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading,
+.error {
+    font-size: 30px;
+    color: gray;
+}
+
+.error {
+    color: tomato;
+}
+
+.cardsContainer {
+    display: flex;
+    flex-wrap: wrap;
+
+    height: 470px;
+    overflow-x: hidden;
+}
+
+.cardsRow {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.cardsRow + .cardsRow {
+    margin-top: 30px;
+}
+
+.party {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.partyTitle {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.partyCards {
+    display: flex;
+}

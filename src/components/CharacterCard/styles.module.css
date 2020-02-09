@@ -1,0 +1,49 @@
+.root {
+    position: relative;
+    background-color: #dadada;
+    width: 180px;
+    height: 220px;
+
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.root + .root {
+    margin-left: 30px;
+}
+
+.closeButton {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.closeButton:focus .close {
+    color: orange;
+}
+
+.cardTitle {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 300;
+    font-size: 24px;
+
+    color: #ffffff;
+}
+
+.hoverable {
+    cursor: pointer;
+}
+
+.close {
+    transform: rotate(45deg);
+    line-height: 0;
+    position: absolute;
+    top: 12px;
+    left: 7px;
+    font-size: 25px;
+    color: grey;
+}
