@@ -1,81 +1,36 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { NextPage } from 'next';
 
-import { CharacterCard } from '../../components/CharacterCard';
-import { isMorty, isRick } from '../../util/checkCharacters';
 import { SearchInput } from '../../components/SearchInput';
 import { Layout } from '../../components/Layout';
-import { Character, focusCards } from '../../types';
-import { transformToRows } from '../../util/transformToRows';
+import { Character } from '../../types';
 import { CharacterResult, QueryCharacterVariables, CHARACTER_QUERY } from '../../query';
+import { CharactersList } from '../../components/CharactersList';
+import { Party, usePartyState } from '../../components/Party';
 
 import css from './styles.module.css';
 
 const Home: NextPage = () => {
     const [characters, setCharacters] = useState<Character[] | null>(null);
-    const [ignoredCards, addToIgnored] = useState<Record<number, boolean>>({});
+    const { party, pickMemberToParty } = usePartyState();
 
-    const [party, setParty] = useState<Record<focusCards, Character | null>>({
-        [focusCards.morty]: null,
-        [focusCards.rick]: null,
-    });
-
-    const [loadGreeting, { loading, error }] = useLazyQuery<
+    const [loadCharacters, { loading, error }] = useLazyQuery<
         CharacterResult,
         QueryCharacterVariables
     >(CHARACTER_QUERY, {
         onCompleted: data => setCharacters(data.characters.results),
     });
 
-    const preparedCharacters = useMemo(
-        () =>
-            transformToRows<Character>({
-                data: characters || [],
-                ignore: ignoredCards,
-                elementsInRow: 4,
-            }),
-        [characters, ignoredCards],
-    );
-
-    const markAsNotInterested = useCallback(
-        ({ id }: Character) => () =>
-            addToIgnored(state => ({
-                ...state,
-                [id]: true,
-            })),
+    const onValueChange = useCallback(
+        (name: string) => loadCharacters({ variables: { name } }),
         [],
     );
-    const pickPatryMember = useCallback(
-        (character: Character) => () => {
-            if (isMorty(character.name)) {
-                setParty(state => ({
-                    ...state,
-                    [focusCards.morty]: character,
-                }));
-            }
-
-            if (isRick(character.name)) {
-                setParty(state => ({
-                    ...state,
-                    [focusCards.rick]: character,
-                }));
-            }
-        },
-        [],
-    );
-    const onValueChange = useCallback((name: string) => loadGreeting({ variables: { name } }), []);
     const onSearchReset = useCallback(() => setCharacters([]), []);
 
     return (
         <Layout className={css.root} documentTitle={'Rick and Morty Party'}>
-            <div className={css.party}>
-                <div className={css.partyTitle}>Party</div>
-                <div className={css.partyCards}>
-                    <CharacterCard {...party[focusCards.rick]} title="Rick" />
-                    <CharacterCard {...party[focusCards.morty]} title="Morty" />
-                </div>
-            </div>
+            <Party party={party} />
 
             <div className={css.status}>
                 {loading && <div className={css.loading}>Loading...</div>}
@@ -92,21 +47,11 @@ const Home: NextPage = () => {
                 debounceTime={300}
             />
 
-            <div className={css.cardsContainer}>
-                {Boolean(preparedCharacters?.[0]?.length) &&
-                    preparedCharacters.map((row, i) => (
-                        <div className={css.cardsRow} key={i}>
-                            {row.map(character => (
-                                <CharacterCard
-                                    {...character}
-                                    key={character.name}
-                                    onClose={markAsNotInterested(character)}
-                                    onSelect={pickPatryMember(character)}
-                                />
-                            ))}
-                        </div>
-                    ))}
-            </div>
+            <CharactersList
+                characters={characters || []}
+                onSelect={pickMemberToParty}
+                elementsInRow={4}
+            />
         </Layout>
     );
 };
